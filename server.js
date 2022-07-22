@@ -36,17 +36,25 @@ function checkLoggedIn(req, res, next) {
   next();
 }
 
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+app.get('/auth/google', passport.authenticate('google', { scope: ['email'] }));
 
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }),
+app.get('/auth/google/callback', passport.authenticate('google', {
+  failureRedirect: '/failure',
+  successRedirect: '/',
+  session: false,
+}),
   (req, res) => {
-    res.redirect('/');
+    console.log('Google auth callback');
   });
 
 app.get('/auth/logout', (req, res) => { });
 
 app.get('/secret', checkLoggedIn, (req, res) => {
   return res.send('Your personal secret value is: 42!');
+});
+
+app.get('/failure', (req, res) => {
+  return res.send('Authentication failed!');
 });
 
 app.get('/', (req, res) => {
